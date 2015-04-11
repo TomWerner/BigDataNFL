@@ -1,0 +1,11 @@
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2002_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2003_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2004_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2005_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2006_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2007_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2008_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2009_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2010_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2011_nfl_pbp_data.csv --headerline
+mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2012_nfl_pbp_data.csv --headerline
