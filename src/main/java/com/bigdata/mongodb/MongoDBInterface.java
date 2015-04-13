@@ -1,5 +1,6 @@
 package com.bigdata.mongodb;
 
+import com.bigdata.DataReporting.SituationStatisticsReport;
 import com.mongodb.DBCursor;
 
 /**
@@ -7,4 +8,6 @@ import com.mongodb.DBCursor;
  */
 public interface MongoDBInterface {
     public DBCursor testGet();
+
+    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline);
 }

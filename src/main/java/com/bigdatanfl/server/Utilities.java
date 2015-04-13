@@ -12,8 +12,13 @@ public class Utilities {
         try {
             Scanner scan = new Scanner(new File(path));
             StringBuilder result = new StringBuilder();
-            while (scan.hasNextLine())
-                result.append(scan.nextLine());
+            while (scan.hasNextLine()) {
+                String line = scan.nextLine();
+                if (line.length() > 0 && line.charAt(0) == '?' && line.charAt(line.length() - 1) == '?')
+                    result.append(render(line.substring(1, line.length() - 1)) + "\n");
+                else
+                    result.append(line + "\n");
+            }
             return result.toString();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
