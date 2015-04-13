@@ -1,0 +1,17 @@
+Professor Dropbox Feedback:
+
+Feedback Date
+Apr 10, 2015 11:57 AM
+Dropbox Feedback
+We talked about providing a probability distribution of the play choices (e.g. run 40%, punt 10%, pass 20%, etc). The user should be able to specify values or ranges for most (if not all) the attributes.
+
+It may be interesting too that the user could specify the action and you can provide a recommendation (confidence) that the play will have a "good" outcome.
+
+Prediction is based in K-NN classification?
+
+
+Todo:
+- Need to figure out how to identify runs
+- Speed up queries, count is taking way too long
+- Start work on expected value
+- Improve options and integrate team picking into situation picking, not currently implemented.

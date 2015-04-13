@@ -16,7 +16,7 @@ import static spark.Spark.*;
 
 public class StarterServer {
     public static void main(String[] args) {
-        MongoDBInterface mongo = new MockMongoDB();
+        MongoDBInterface mongo = new MongoImpl(); //new MockMongoDB();
 
         get("/", (req, res) -> Utilities.render("static/html/HomePage.html"));
         get("/situations", (req, res) -> Utilities.render("static/html/SituationsPage.html"));

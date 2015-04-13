@@ -33,6 +33,8 @@ public class SituationStatisticsReport {
         this.fieldGoalPlays = fieldGoalPlays;
         this.extraPointPlays = extraPointPlays;
         this.runPlays = runPlays;
+        System.out.println("TOTAL PLAYS: " + totalPlays);
         this.other = totalPlays - (passPlays + incompletePassPlays + fieldGoalPlays + extraPointPlays + runPlays);
+        this.other = Math.max(0, this.other);
     }
 }
