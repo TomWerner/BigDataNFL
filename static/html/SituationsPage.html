@@ -75,7 +75,46 @@
                     <option value="10">Opp: 10 - Goal line</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline)">Submit</button>
+            <div class="form-group">
+                <label for="team">Team on Offense</label>
+                <select class="form-control" id="team" ng-model="team" ng-init="team='ANY'">
+                    <option value="ANY">Any Team</option>
+                    <option value="ARI">Arizona Cardinals</option>
+                    <option value="ATL">Atlanta Falcons</option>
+                    <option value="BAL">Baltimore Ravens</option>
+                    <option value="BUF">Buffalo Bills</option>
+                    <option value="CAR">Carolina Panthers</option>
+                    <option value="CHI">Chicago Bears</option>
+                    <option value="CIN">Cincinnati Bengals</option>
+                    <option value="CLE">Cleveland Browns</option>
+                    <option value="DAL">Dallas Cowboys</option>
+                    <option value="DEN">Denver Broncos</option>
+                    <option value="DET">Detroit Lions</option>
+                    <option value="GB">Green Bay Packers</option>
+                    <option value="HOU">Houston Texans</option>
+                    <option value="IND">Indianapolis Colts</option>
+                    <option value="JAX">Jacksonville Jaguars</option>
+                    <option value="KC">Kansas City Chiefs</option>
+                    <option value="MIA">Miami Dolphins</option>
+                    <option value="MIN">Minnesota Vikings</option>
+                    <option value="NE">New England Patriots</option>
+                    <option value="NO">New Orleans Saints</option>
+                    <option value="NYG">New York Giants</option>
+                    <option value="NYJ">New York Jets</option>
+                    <option value="OAK">Oakland Raiders</option>
+                    <option value="PHI">Philadelphia Eagles</option>
+                    <option value="PIT">Pittsburgh Steelers</option>
+                    <option value="SD">San Diego Chargers</option>
+                    <option value="SEA">Seattle Seahawks</option>
+                    <option value="SF">San Francisco 49ers</option>
+                    <option value="STL">Saint Louis Rams</option>
+                    <option value="TB">Tampa Bay Buccaneers</option>
+                    <option value="TEN">Tennessee Titans</option>
+                    <option value="WAS">Washington Redskins</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team)">Submit</button>
         </form>
 
         <div id="chart_div" style="width:100%;height:600px"></div>
@@ -96,8 +135,8 @@
     app.controller('customersCtrl', function($scope, $http) {
         $scope.results = [];
 
-        $scope.get_results = function(down, togo, ydline) {
-            $http.get("/api/playstats?down=" + down + "&togo=" + togo + "&ydline=" + ydline)
+        $scope.get_results = function(down, togo, ydline, team) {
+            $http.get("/api/playstats?down=" + down + "&togo=" + togo + "&ydline=" + ydline + "&team=" + team)
                     .success(function (response) {
                         $scope.results = response;
                         var data = new google.visualization.DataTable();
@@ -107,16 +146,9 @@
                         for (i = 0; i < response['names'].length; i++) {
                             data.addRow([response['prettyNames'][i], response[response['names'][i]]]);
                         }
-//                        data.addRows([
-//                            ['Mushrooms', 3],
-//                            ['Onions', 1],
-//                            ['Olives', 1],
-//                            ['Zucchini', 1],
-//                            ['Pepperoni', 8]
-//                        ]);
 
                         // Set chart options
-                        var options = {'title':'Coach decisions'};
+                        var options = {'title': response['title']};
 
                         // Instantiate and draw our chart, passing in some options.
                         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));

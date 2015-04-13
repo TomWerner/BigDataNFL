@@ -29,13 +29,14 @@ public class StarterServer {
             int down = Integer.parseInt(req.queryParams("down"));
             int togo = Integer.parseInt(req.queryParams("togo"));
             int ydline = Integer.parseInt(req.queryParams("ydline"));
+            String team = req.queryParams("team");
 
 //            Iterator<DBObject> iter = mongo.getAllPlays(down, togo, ydline);
 //            ArrayList<DBObject> results = new ArrayList<DBObject>();
 //            for (int i = 0; i < 20 && iter.hasNext(); i++)
 //                results.add(iter.next());
 //            String result = new Gson().toJson(results);
-            String result = new Gson().toJson(mongo.getAllPlays(down, togo, ydline));
+            String result = new Gson().toJson(mongo.getAllPlays(down, togo, ydline, team));
             System.out.println(result);
             return result;
         });
@@ -55,8 +56,8 @@ public class StarterServer {
         }
 
         @Override
-        public SituationStatisticsReport getAllPlays(int down, int togo, int ydline) {
-            return new SituationStatisticsReport(100, 50, 20, 10, 5, 15);
+        public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team) {
+            return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team), 100, 50, 20, 10, 5, 15);
         }
     }
 }

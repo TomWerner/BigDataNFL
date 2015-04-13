@@ -5,6 +5,7 @@ package com.bigdata.DataReporting;
  */
 public class SituationStatisticsReport {
     public long passPlays, incompletePassPlays, fieldGoalPlays, extraPointPlays, runPlays, other;
+    public String title;
     public String[] names = {"passPlays",
                             "incompletePassPlays",
                             "fieldGoalPlays",
@@ -18,13 +19,15 @@ public class SituationStatisticsReport {
                                 "Run Plays",
                                 "Other"};
 
-    public SituationStatisticsReport(long totalPlays,
+    public SituationStatisticsReport(String title,
+                                     long totalPlays,
                                      long passPlays,
                                      long incompletePassPlays,
                                      long fieldGoalPlays,
                                      long extraPointPlays,
                                      long runPlays) {
 //        this.totalPlays = totalPlays;
+        this.title = title;
         this.passPlays = passPlays;
         this.incompletePassPlays = incompletePassPlays;
         this.fieldGoalPlays = fieldGoalPlays;

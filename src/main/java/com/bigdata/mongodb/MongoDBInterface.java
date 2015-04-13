@@ -9,5 +9,5 @@ import com.mongodb.DBCursor;
 public interface MongoDBInterface {
     public DBCursor testGet();
 
-    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline);
+    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team);
 }

@@ -2,6 +2,7 @@ package com.bigdata.mongodb; /**
  * Created by test on 4/9/15.
  */
 import com.bigdata.DataReporting.SituationStatisticsReport;
+import com.bigdatanfl.server.Utilities;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
@@ -23,7 +24,7 @@ public class MongoImpl implements MongoDBInterface {
     }
 
     @Override
-    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline) {
+    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team) {
         BasicDBObject query = new BasicDBObject();
 
         if (down == 0) //Extra point or kickoff
@@ -49,8 +50,16 @@ public class MongoImpl implements MongoDBInterface {
         long extraPointPlays = collection.count(extraPointQuery);
         long runPlays = 0;
 
-        return new SituationStatisticsReport(totalPlays, passPlays, incompletePassPlays, fieldGoalPlays, extraPointPlays, runPlays);
+        return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team),
+                                            totalPlays,
+                                            passPlays,
+                                            incompletePassPlays,
+                                            fieldGoalPlays,
+                                            extraPointPlays,
+                                            runPlays);
     }
+
+
     protected MongoClient getMongoClient(String url, int port) {
         MongoClient mongoClient = null;
         try {
