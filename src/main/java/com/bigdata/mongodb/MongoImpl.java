@@ -38,21 +38,35 @@ public class MongoImpl implements MongoDBInterface {
             query.put("togo", new BasicDBObject("$gt", togo));
         query.put("ydline", new BasicDBObject("$lte", ydline).append("$gt", (ydline - 10)));
 
-        BasicDBObject passQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "pass -incomplete")).copy();
-        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "pass incomplete")).copy();
+        BasicDBObject passQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "pass")).copy();
+        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "incomplete")).copy();
         BasicDBObject fieldGoalQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "\"field goal\"")).copy();
         BasicDBObject extraPointQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "\"extra point\"")).copy();
-
+        long time = System.currentTimeMillis();
         long totalPlays = collection.count(query);
-        long passPlays = collection.count(passQuery);
-        long incompletePassPlays = collection.count(incompletePassQuery);
-        long fieldGoalPlays = collection.count(fieldGoalQuery);
-        long extraPointPlays = collection.count(extraPointQuery);
-        long runPlays = 0;
+        System.out.println("TotalPlays query time: " + (System.currentTimeMillis() - time));
 
+        time = System.currentTimeMillis();
+        long passPlays = collection.count(passQuery);
+        System.out.println("PassPlays query time: " + (System.currentTimeMillis() - time));
+
+        time = System.currentTimeMillis();
+        long incompletePassPlays = collection.count(incompletePassQuery);
+        System.out.println("Incomplete pass query time: " + (System.currentTimeMillis() - time));
+
+        time = System.currentTimeMillis();
+        long fieldGoalPlays = collection.count(fieldGoalQuery);
+        System.out.println("Field Goal query time: " + (System.currentTimeMillis() - time));
+
+        time = System.currentTimeMillis();
+        long extraPointPlays = collection.count(extraPointQuery);
+        System.out.println("Extra point query time: " + (System.currentTimeMillis() - time));
+
+
+        long runPlays = 0;
         return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team),
                                             totalPlays,
-                                            passPlays,
+                                            passPlays - incompletePassPlays,
                                             incompletePassPlays,
                                             fieldGoalPlays,
                                             extraPointPlays,

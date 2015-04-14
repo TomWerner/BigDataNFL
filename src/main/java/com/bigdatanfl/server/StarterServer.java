@@ -6,9 +6,14 @@ import com.bigdata.mongodb.MongoImpl;
 import com.google.gson.Gson;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import spark.Spark;
-import spark.SparkBase;
+import spark.*;
+import spark.utils.IOUtils;
 
+import javax.servlet.ServletOutputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -16,10 +21,11 @@ import static spark.Spark.*;
 
 public class StarterServer {
     public static void main(String[] args) {
-        MongoDBInterface mongo = new MongoImpl(); //new MockMongoDB();
+        MongoDBInterface mongo = new MockMongoDB(); //new MongoImpl(); //
 
         get("/", (req, res) -> Utilities.render("static/html/HomePage.html"));
         get("/situations", (req, res) -> Utilities.render("static/html/SituationsPage.html"));
+        get("/expectations", (req, res) -> Utilities.render("static/html/ExpectationsPage.html"));
 
 
 
@@ -31,20 +37,26 @@ public class StarterServer {
             int ydline = Integer.parseInt(req.queryParams("ydline"));
             String team = req.queryParams("team");
 
-//            Iterator<DBObject> iter = mongo.getAllPlays(down, togo, ydline);
-//            ArrayList<DBObject> results = new ArrayList<DBObject>();
-//            for (int i = 0; i < 20 && iter.hasNext(); i++)
-//                results.add(iter.next());
-//            String result = new Gson().toJson(results);
             String result = new Gson().toJson(mongo.getAllPlays(down, togo, ydline, team));
             System.out.println(result);
             return result;
         });
 
+        
+
         // CSS file serving, couldn't get static files working
         get("/css/:name", (req, res) -> {
             res.type("text/css");
             return Utilities.render("static/css/" + req.params(":name"));
+        });
+        get("/images/:name", new Route() {
+            @Override
+            public Object handle(Request req, Response res) throws Exception {
+                res.type("image/gif");
+                ServletOutputStream writer = res.raw().getOutputStream();
+                writer.write(IOUtils.toByteArray(Utilities.inputStream("static/images/" + req.params(":name"))));
+                return writer;
+            }
         });
     }
 
@@ -57,7 +69,12 @@ public class StarterServer {
 
         @Override
         public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team) {
-            return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team), 100, 50, 20, 10, 5, 15);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team), 100, 40, 30, 10, 5, 15);
         }
     }
 }

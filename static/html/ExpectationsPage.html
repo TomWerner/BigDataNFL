@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>NFL Situations</title>
+    <title>NFL Expectations</title>
     <meta charset="utf-8">
 
     <!--Scripts-->
@@ -38,8 +38,8 @@
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
-                <li class="active"><a href="/situations">Choose a Situation</a></li>
-                <li><a href="/expectations">Check your expectations</a></li>
+                <li><a href="/situations">Choose a Situation</a></li>
+                <li class="active"><a href="/expectations">Check your expectations</a></li>
                 <li><a href="#">About</a></li>
             </ul>
         </div>
@@ -48,7 +48,7 @@
 
 <div class="container">
     <div ng-app="myApp" ng-controller="customersCtrl">
-    <div class="page-header">
+        <div class="page-header">
             <h1>NFL Situational Statistics</h1>
         </div>
 
@@ -132,6 +132,17 @@
                     <option value="WAS">Washington Redskins</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="playchoice">Play Choice:</label>
+                <select class="form-control" id="playchoice" ng-model="playchoice" ng-init="playchoice='pass'">
+                    <option value="pass">Pass</option>
+                    <option value="middlerun">Run up the middle</option>
+                    <option value="run">Outside run</option>
+                    <option value="fieldgoal">Field goal attempt</option>
+                    <option value="punt">Punt</option>
+                    <option value="fakepunt">Fake Punt</option>
+                </select>
+            </div>
 
             <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team)">Submit</button>
         </form>
@@ -168,7 +179,7 @@
 
                         // Set chart options
                         var options = {'title': response['title'],
-                                        is3D: false,};
+                            is3D: false,};
 
                         // Instantiate and draw our chart, passing in some options.
                         chart = new google.visualization.PieChart(document.getElementById('chart_div'));

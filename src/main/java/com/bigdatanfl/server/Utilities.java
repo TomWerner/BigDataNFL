@@ -1,7 +1,6 @@
 package com.bigdatanfl.server;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -107,5 +106,9 @@ public class Utilities {
         teamMap.put("WAS", "Washington Redskins");
 
         return teamMap.get(teamABVR);
+    }
+
+    public static InputStream inputStream(String path) throws FileNotFoundException {
+        return new BufferedInputStream(new FileInputStream(path));
     }
 }

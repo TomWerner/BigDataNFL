@@ -1,3 +1,12 @@
 body {
     padding-top: 70px;
+    background: #f3f3f3;
+}
+
+div.container {
+    background: #fff;
+}
+
+div.jumbotron {
+    background: #fff;
 }
