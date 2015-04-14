@@ -144,11 +144,16 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team)">Submit</button>
+            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team, playchoice)">Submit</button>
         </form>
 
         <img src="/images/ajax-loader.gif" id="loading-indicator" style="display:none" class="img-responsive center-block" />
-        <div id="chart_div" style="width:100%;height:600px"></div>
+        <div class="container-fluid">
+            <h2>{{results['title']}}</h2>
+            <div id="results_div">
+                <h3 ng-repeat="name in results.names">{{results["pretty" + name] }}: {{ results[name] }}</h3>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -158,34 +163,22 @@
     var app = angular.module('myApp', [])
     app.controller('customersCtrl', function($scope, $http) {
         $scope.results = [];
-        var chart;
 
-        $scope.get_results = function(down, togo, ydline, team) {
+        $scope.get_results = function(down, togo, ydline, team, playchoice) {
             $('#loading-indicator').show();
-            if (chart != null) {
-                chart.clearChart();
-            }
+            $scope.results = [];
 
-            $http.get("/api/playstats?down=" + down + "&togo=" + togo + "&ydline=" + ydline + "&team=" + team)
+            $http.get("/api/playexpectations?down=" + down
+                            + "&togo=" + togo
+                            + "&ydline=" + ydline
+                            + "&team=" + team
+                            + "&playchoice=" + playchoice)
                     .success(function (response) {
-                        $scope.results = response;
-                        var data = new google.visualization.DataTable();
-                        data.addColumn('string', 'Play');
-                        data.addColumn('number', 'Plays');
-
-                        for (i = 0; i < response['names'].length; i++) {
-                            data.addRow([response['prettyNames'][i], response[response['names'][i]]]);
-                        }
-
-                        // Set chart options
-                        var options = {'title': response['title'],
-                            is3D: false,};
-
-                        // Instantiate and draw our chart, passing in some options.
-                        chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-                        chart.draw(data, options);
                         $('#loading-indicator').hide();
-                        $('#chart-div').show();
+                        for (i = 0; i < response['names'].length; i++) {
+                            response[["pretty" + response['names'][i]]] = response['prettyNames'][i];
+                        }
+                        $scope.results = response;
                     });
         };
     });

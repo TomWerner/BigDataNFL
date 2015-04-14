@@ -65,7 +65,7 @@ public class MongoImpl implements MongoDBInterface {
 
 
         long runPlays = 0;
-        return new SituationStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team),
+        return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team),
                                             totalPlays,
                                             passPlays - incompletePassPlays,
                                             incompletePassPlays,

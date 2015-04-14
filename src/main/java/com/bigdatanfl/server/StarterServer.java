@@ -37,6 +37,8 @@ public class StarterServer {
             int ydline = Integer.parseInt(req.queryParams("ydline"));
             String team = req.queryParams("team");
             String play = req.queryParams("playchoice");
+            System.out.println(req.queryParams());
+            System.out.println(play);
 
             String result = new Gson().toJson(mongo.getPlayExpectations(down, togo, ydline, team, play));
             return result;
@@ -80,8 +82,7 @@ public class StarterServer {
 
         @Override
         public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play) {
-            return new ExpectationsStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team, play),
-                    );
+            return new ExpectationsStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team, play), 3.5, 1.2, .01);
         }
     }
 }

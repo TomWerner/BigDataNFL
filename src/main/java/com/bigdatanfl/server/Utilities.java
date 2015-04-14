@@ -38,6 +38,7 @@ public class Utilities {
     }
 
     private static String getPlay(String play) {
+        System.out.println(play);
         if (play.equals("pass")) return "Pass";
         if (play.equals("middlerun")) return "Run up the middle";
         if (play.equals("run")) return "Outside run";
