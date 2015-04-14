@@ -1,6 +1,7 @@
 package com.bigdata.mongodb; /**
  * Created by test on 4/9/15.
  */
+import com.bigdata.DataReporting.ExpectationsStatisticsReport;
 import com.bigdata.DataReporting.SituationStatisticsReport;
 import com.bigdatanfl.server.Utilities;
 import com.mongodb.*;
@@ -24,7 +25,7 @@ public class MongoImpl implements MongoDBInterface {
     }
 
     @Override
-    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team) {
+    public SituationStatisticsReport getPlayStats(int down, int togo, int ydline, String team) {
         BasicDBObject query = new BasicDBObject();
 
         if (down == 0) //Extra point or kickoff
@@ -64,13 +65,19 @@ public class MongoImpl implements MongoDBInterface {
 
 
         long runPlays = 0;
-        return new SituationStatisticsReport(Utilities.getTitle(down, togo, ydline, team),
+        return new SituationStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team),
                                             totalPlays,
                                             passPlays - incompletePassPlays,
                                             incompletePassPlays,
                                             fieldGoalPlays,
                                             extraPointPlays,
                                             runPlays);
+    }
+
+    @Override
+    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play) {
+        //TODO: FIX THIS!!
+        return null;
     }
 
 

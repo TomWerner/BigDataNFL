@@ -1,5 +1,6 @@
 package com.bigdata.mongodb;
 
+import com.bigdata.DataReporting.ExpectationsStatisticsReport;
 import com.bigdata.DataReporting.SituationStatisticsReport;
 import com.mongodb.DBCursor;
 
@@ -9,5 +10,7 @@ import com.mongodb.DBCursor;
 public interface MongoDBInterface {
     public DBCursor testGet();
 
-    public SituationStatisticsReport getAllPlays(int down, int togo, int ydline, String team);
+    public SituationStatisticsReport getPlayStats(int down, int togo, int ydline, String team);
+
+    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play);
 }

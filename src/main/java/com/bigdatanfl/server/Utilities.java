@@ -26,9 +26,27 @@ public class Utilities {
         return "Path Error. Tried " + path + ".";
     }
 
-    public static String getTitle(int down, int togo, int ydline, String team) {
+    public static String getStatsTitle(int down, int togo, int ydline, String team) {
         return getTeam(team) + " decisions when faced with " + getDown(down) + " and " + getTogo(togo) + " yards to go, on their " + getYardline(ydline);
     }
+
+    public static String getExpectationsTitle(int down, int togo, int ydline, String team, String play) {
+        return getTeam(team) + " outcomes when doing a \"" + getPlay(play) + "\" play faced with " +
+                getDown(down) + " and " +
+                getTogo(togo) + " yards to go, on their " +
+                getYardline(ydline);
+    }
+
+    private static String getPlay(String play) {
+        if (play.equals("pass")) return "Pass";
+        if (play.equals("middlerun")) return "Run up the middle";
+        if (play.equals("run")) return "Outside run";
+        if (play.equals("fieldgoal")) return "Field goal attempt";
+        if (play.equals("punt")) return "Punt";
+        if (play.equals("fakepunt")) return "Fake Punt";
+        return "Other";
+    }
+
 
     private static String getTeam(String team) {
         if (team.equals("ANY"))
