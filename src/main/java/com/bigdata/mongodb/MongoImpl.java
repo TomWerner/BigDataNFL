@@ -39,39 +39,43 @@ public class MongoImpl implements MongoDBInterface {
             query.put("togo", new BasicDBObject("$gt", togo));
         query.put("ydline", new BasicDBObject("$lte", ydline).append("$gt", (ydline - 10)));
 
-        BasicDBObject passQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "pass")).copy();
-        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "incomplete")).copy();
-        BasicDBObject fieldGoalQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "\"field goal\"")).copy();
-        BasicDBObject extraPointQuery = (BasicDBObject) query.append("$text", new BasicDBObject("$search", "\"extra point\"")).copy();
-        long time = System.currentTimeMillis();
-        long totalPlays = collection.count(query);
-        System.out.println("TotalPlays query time: " + (System.currentTimeMillis() - time));
+        BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
+        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
+        BasicDBObject fieldGoalQuery = (BasicDBObject) query.append("play-choice", "FIELD GOAL").copy();
+        BasicDBObject extraPointQuery = (BasicDBObject) query.append("play-choice", "EXTRA POINT").copy();
+        BasicDBObject runMiddleQuery = (BasicDBObject) query.append("play-choice", "RUN MIDDLE").copy();
+        BasicDBObject runLeftQuery = (BasicDBObject) query.append("play-choice", "RUN LEFT").copy();
+        BasicDBObject runRightQuery = (BasicDBObject) query.append("play-choice", "RUN RIGHT").copy();
+        BasicDBObject runOtherQuery = (BasicDBObject) query.append("play-choice", "RUN OTHER").copy();
+//        BasicDBObject fumbleQuery = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
+//        BasicDBObject fumble = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
+//        BasicDBObject fumble = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
 
-        time = System.currentTimeMillis();
-        long passPlays = collection.count(passQuery);
-        System.out.println("PassPlays query time: " + (System.currentTimeMillis() - time));
+        long totalPlays = timeCount(query);
+        long passPlays = timeCount(passQuery);
+        long incompletePassPlays = timeCount(incompletePassQuery);
+        long fieldGoalPlays = timeCount(fieldGoalQuery);
+        long extraPointPlays = timeCount(extraPointQuery);
+        long runMiddlePlays = timeCount(runMiddleQuery);
+        long runLeftPlays = timeCount(runLeftQuery);
+        long runRightPlays = timeCount(runRightQuery);
 
-        time = System.currentTimeMillis();
-        long incompletePassPlays = collection.count(incompletePassQuery);
-        System.out.println("Incomplete pass query time: " + (System.currentTimeMillis() - time));
-
-        time = System.currentTimeMillis();
-        long fieldGoalPlays = collection.count(fieldGoalQuery);
-        System.out.println("Field Goal query time: " + (System.currentTimeMillis() - time));
-
-        time = System.currentTimeMillis();
-        long extraPointPlays = collection.count(extraPointQuery);
-        System.out.println("Extra point query time: " + (System.currentTimeMillis() - time));
-
-
-        long runPlays = 0;
         return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team),
                                             totalPlays,
-                                            passPlays - incompletePassPlays,
+                                            passPlays,
                                             incompletePassPlays,
                                             fieldGoalPlays,
                                             extraPointPlays,
-                                            runPlays);
+                                            runMiddlePlays,
+                                            runLeftPlays,
+                                            runRightPlays);
+    }
+
+    private long timeCount(BasicDBObject query) {
+        long startTime = System.currentTimeMillis();
+        long count = collection.count(query);
+        System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime) + "\t" + query);
+        return count;
     }
 
     @Override

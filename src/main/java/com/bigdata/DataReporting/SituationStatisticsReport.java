@@ -25,14 +25,16 @@ public class SituationStatisticsReport {
                                      long incompletePassPlays,
                                      long fieldGoalPlays,
                                      long extraPointPlays,
-                                     long runPlays) {
+                                     long runMiddlePlays,
+                                     long runLeftPlays,
+                                     long runRightPlays) {
 //        this.totalPlays = totalPlays;
         this.title = title;
         this.passPlays = passPlays;
         this.incompletePassPlays = incompletePassPlays;
         this.fieldGoalPlays = fieldGoalPlays;
         this.extraPointPlays = extraPointPlays;
-        this.runPlays = runPlays;
+        this.runPlays = runMiddlePlays + runLeftPlays + runRightPlays;
         System.out.println("TOTAL PLAYS: " + totalPlays);
         this.other = totalPlays - (passPlays + incompletePassPlays + fieldGoalPlays + extraPointPlays + runPlays);
         this.other = Math.max(0, this.other);

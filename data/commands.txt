@@ -10,5 +10,24 @@ mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2010_nfl_pbp_data.csv
 mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2011_nfl_pbp_data.csv --headerline
 mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2012_nfl_pbp_data.csv --headerline
 
-use nfl
-db.playbyplay.createIndex({ description: "text"})
+> use nfl
+> db.playbyplay.createIndex({ description: "text"})
+> db.playbyplay.createIndex( { "down" : 1, "togo" : 1, "ydline" : 1 } )
+
+# Run these in order!!
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "\"pass\" -\"incomplete\""}}, {$set: {"play-choice": "PASS"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "\"pass\" \"incomplete\""}}, {$set: {"play-choice": "PASS INCOMPLETE"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "punt"}}, {$set: {"play-choice": "PUNT"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "extra point"}}, {$set: {"play-choice": "EXTRA POINT"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "kick"}}, {$set: {"play-choice": "KICK"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "field goal"}}, {$set: {"play-choice": "FIELD GOAL"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "sack"}}, {$set: {"play-choice": "SACK"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "spike"}}, {$set: {"play-choice": "SPIKE"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "up the middle"}}, {$set: {"play-choice": "RUN MIDDLE"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "left"}}, {$set: {"play-choice": "RUN LEFT"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "right"}}, {$set: {"play-choice": "RUN RIGHT"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "kneel"}}, {$set: {"play-choice": "KNEEL"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "to for yard"}}, {$set: {"play-choice": "RUN OTHER"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "to for no gain"}}, {$set: {"play-choice": "RUN OTHER"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "push for"}}, {$set: {"play-choice": "RUN OTHER"}}, false, true)
+> db.playbyplay.update({"play-choice": null, "$text": { "$search" : "fumble"}}, {$set: {"play-choice": "FUMBLE"}}, false, true)

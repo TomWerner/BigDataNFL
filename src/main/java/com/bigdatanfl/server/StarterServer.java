@@ -3,6 +3,7 @@ package com.bigdatanfl.server;
 import com.bigdata.DataReporting.ExpectationsStatisticsReport;
 import com.bigdata.DataReporting.SituationStatisticsReport;
 import com.bigdata.mongodb.MongoDBInterface;
+import com.bigdata.mongodb.MongoImpl;
 import com.google.gson.Gson;
 import com.mongodb.DBCursor;
 import spark.*;
@@ -14,7 +15,7 @@ import static spark.Spark.*;
 
 public class StarterServer {
     public static void main(String[] args) {
-        MongoDBInterface mongo = new MockMongoDB(); //new MongoImpl(); //
+        MongoDBInterface mongo = new MongoImpl(); //new MockMongoDB(); //
 
         get("/", (req, res) -> Utilities.render("static/html/HomePage.html"));
         get("/situations", (req, res) -> Utilities.render("static/html/SituationsPage.html"));
@@ -29,6 +30,7 @@ public class StarterServer {
             String team = req.queryParams("team");
 
             String result = new Gson().toJson(mongo.getPlayStats(down, togo, ydline, team));
+            System.out.println(result);
             return result;
         });
         get("/api/playexpectations", (req, res) -> {
@@ -77,7 +79,7 @@ public class StarterServer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team), 100, 40, 30, 10, 5, 15);
+            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team), 100, 20, 15, 10, 5, 20, 15, 15);
         }
 
         @Override
