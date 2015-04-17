@@ -30,14 +30,14 @@ public class MongoImpl implements MongoDBInterface {
 
         if (down == 0) //Extra point or kickoff
             query.put("down", "");
-        else //Normal case
+        else {//Normal case
             query.put("down", down);
-
-        if (togo <= 10) //Normal case
             query.put("togo", togo);
-        else //11+ yards
-            query.put("togo", new BasicDBObject("$gt", togo));
-        query.put("ydline", new BasicDBObject("$lte", ydline).append("$gt", (ydline - 10)));
+            query.put("ydline", new BasicDBObject("$lte", ydline).append("$gt", (ydline - 10)));
+        }
+
+        if (!team.equals("ANY"))
+            query.append("off", team);
 
         BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
         BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
@@ -48,8 +48,8 @@ public class MongoImpl implements MongoDBInterface {
         BasicDBObject runRightQuery = (BasicDBObject) query.append("play-choice", "RUN RIGHT").copy();
         BasicDBObject runOtherQuery = (BasicDBObject) query.append("play-choice", "RUN OTHER").copy();
 //        BasicDBObject fumbleQuery = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
-//        BasicDBObject fumble = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
-//        BasicDBObject fumble = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
+        BasicDBObject puntQuery = (BasicDBObject) query.append("play-choice", "PUNT").copy();
+        BasicDBObject spikeQuery = (BasicDBObject) query.append("play-choice", "SPIKE").copy();
 
         long totalPlays = timeCount(query);
         long passPlays = timeCount(passQuery);
@@ -59,6 +59,9 @@ public class MongoImpl implements MongoDBInterface {
         long runMiddlePlays = timeCount(runMiddleQuery);
         long runLeftPlays = timeCount(runLeftQuery);
         long runRightPlays = timeCount(runRightQuery);
+        long runOtherPlays = timeCount(runOtherQuery);
+        long puntPlays = timeCount(puntQuery);
+        long spikePlays = timeCount(puntQuery);
 
         return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team),
                                             totalPlays,
@@ -68,7 +71,10 @@ public class MongoImpl implements MongoDBInterface {
                                             extraPointPlays,
                                             runMiddlePlays,
                                             runLeftPlays,
-                                            runRightPlays);
+                                            runRightPlays,
+                                            runOtherPlays,
+                                            puntPlays,
+                                            spikePlays);
     }
 
     private long timeCount(BasicDBObject query) {

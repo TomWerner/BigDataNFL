@@ -69,10 +69,7 @@ public class Utilities {
     }
 
     private static String getTogo(int togo) {
-        if (togo <= 10)
-            return "" + togo;
-        else
-            return "more than 10";
+        return "" + togo;
     }
 
     private static String getYardline(int ydline) {

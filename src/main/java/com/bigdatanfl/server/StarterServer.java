@@ -79,7 +79,7 @@ public class StarterServer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team), 100, 20, 15, 10, 5, 20, 15, 15);
+            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team), 100, 20, 15, 10, 5, 15, 15, 10, 10, 4, 1);
         }
 
         @Override

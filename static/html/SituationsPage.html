@@ -76,7 +76,6 @@
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
-                    <option value="11">&gt;10</option>
                 </select>
             </div>
             <div class="form-group">
@@ -163,6 +162,7 @@
                         data.addColumn('number', 'Plays');
 
                         for (i = 0; i < response['names'].length; i++) {
+                            console.log(response['names'][i]);
                             data.addRow([response['prettyNames'][i], response[response['names'][i]]]);
                         }
 
