@@ -31,3 +31,8 @@ mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2012_nfl_pbp_data.csv
 > db.playbyplay.update({"play-choice": null, "$text": { "$search" : "to for no gain"}}, {$set: {"play-choice": "RUN OTHER"}}, false, true)
 > db.playbyplay.update({"play-choice": null, "$text": { "$search" : "push for"}}, {$set: {"play-choice": "RUN OTHER"}}, false, true)
 > db.playbyplay.update({"play-choice": null, "$text": { "$search" : "fumble"}}, {$set: {"play-choice": "FUMBLE"}}, false, true)
+
+# This is fast, I tried to do regex for the loop but it didn't work
+> db.playbyplay.update({"description" : /for no gain/}, {$set: {"yards-gained": 0}}, false, true)
+# This one takes about half an hour... I'm sure there's a faster way, probably with map reduce, but I have time to experiment
+> for (i = -100; i < 100; i++) { db.playbyplay.update({"$text": {"$search": "\"for " + String(i) + " yard\""}}, {$set: {"yards-gained": i}}, false, true); }
