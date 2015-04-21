@@ -61,7 +61,7 @@ public class MongoImpl implements MongoDBInterface {
         long runRightPlays = timeCount(runRightQuery);
         long runOtherPlays = timeCount(runOtherQuery);
         long puntPlays = timeCount(puntQuery);
-        long spikePlays = timeCount(puntQuery);
+        long spikePlays = timeCount(spikeQuery);
 
         return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team),
                                             totalPlays,

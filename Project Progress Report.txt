@@ -1,0 +1,33 @@
+Team:
+Tom Werner, Mitch Kinney, Elaine Mou
+
+Code:
+https://github.com/TomWerner/BigDataNFL
+
+Project Description:
+We are taking 10 years of NFL play by play data and running two different queries on the data.
+1) A play breakdown query
+   Input: Given a "situation" (field position, what down it is, how many yards to the first down, and a team)
+   Output: A pie chart breakdown of what plays were chosen. Uses range queries to find plays matching the input
+
+2) A play comparison query
+   Input: Given a "situation" and two different play choices
+   Output: Using range queries to identify plays matching that situation, compute the "expected value" of the
+           play choice and display it to the user. If this query strategy doesn't work, perhaps use a KNN query
+
+Project Milestones
+- Data imported into MongoDB (Done)
+- Java/MongoDB interaction (Done)
+- Spark webserver working (Done)
+- Use an inverted index on the play description to determine play type for each play (Done)
+- Use an inverted index on the play description to determine yards gained for each play (90% done, kicks/punts not finished)
+- Use an inverted index on the play description to determine points scored for each play (Not done)
+- Index the DB on the "situation" fields for faster queries (Done)
+- Displaying HTML pages on the webserver (Done)
+- Create the query 1 page (Done)
+- Creating a REST interface for query 1 (Done)
+- Display the data results for query 1 (Done)
+- Create the query 2 page (Not done)
+- Creating a REST interface for query 2 (Not done)
+- Display the data results for query 2 (Not done)
+- Investigate KNN possibility and accuracy over range queries (Not done)
