@@ -36,3 +36,20 @@ mongoimport.exe -d "nfl" -c playbyplay --type csv --file .\2012_nfl_pbp_data.csv
 > db.playbyplay.update({"description" : /for no gain/}, {$set: {"yards-gained": 0}}, false, true)
 # This one takes about half an hour... I'm sure there's a faster way, probably with map reduce, but I have time to experiment
 > for (i = -100; i < 100; i++) { db.playbyplay.update({"$text": {"$search": "\"for " + String(i) + " yard\""}}, {$set: {"yards-gained": i}}, false, true); }
+
+db.playbyplay.update({"play-choice":"FIELD GOAL", "description": /field goal is GOOD/}, {$set: {"points-scored": 3}}, false, true)
+db.playbyplay.update({"play-choice":"FIELD GOAL", "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"TWO-POINT\""}}, {$set: {"play-choice": "TWO POINT ATTEMPT"}}, false, true)
+db.playbyplay.update({"play-choice":"TWO POINT ATTEMPT", "description": /ATTEMPT FAILS/}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"play-choice":"TWO POINT ATTEMPT", "description": /ATTEMPT SUCCEEDS/}, {$set: {"points-scored": 2}}, false, true)
+db.playbyplay.update({"description": /TOUCHDOWN/}, {$set: {"points-scored": 6}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"End Zone\" \"SAFETY\""}}, {$set: {"points-scored": 2}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"extra point is good\""}, "points-scored": null}, {$set: {"points-scored": 1}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"extra point is no good\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"extra point is blocked\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"extra point is aborted\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"made the extra point\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "FUMBLE"}}, {$set: {"play-choice": "FUMBLE"}}, false, true)
+db.playbyplay.update({"_id":  ObjectId("55295a71dac696a54e529084")}, {$set: {"play-choice": "KICK"}}, false, true)
+db.playbyplay.update({"_id": ObjectId("55295a77dac696a54e534a6e")}, {$set: {"play-choice": "KICK"}}, false, true)
+db.playbyplay.update({"_id":  ObjectId("55295b7edac696a54e5559da")}, {$set: {"play-choice": "KICK"}}, false, true)
