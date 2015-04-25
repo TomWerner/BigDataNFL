@@ -131,29 +131,56 @@
                     <option value="WAS">Washington Redskins</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="playchoice">Play Choice:</label>
-                <select class="form-control" id="playchoice" ng-model="playchoice" ng-init="playchoice='pass'">
-                    <option value="pass">Pass</option>
-                    <option value="middlerun">Run up the middle</option>
-                    <option value="run">Outside run</option>
-                    <option value="fieldgoal">Field goal attempt</option>
-                    <option value="punt">Punt</option>
-                    <option value="fakepunt">Fake Punt</option>
-                </select>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label for="playchoice1">Play Choice 1:</label>
+                        <select class="form-control" id="playchoice1" ng-model="playchoice1" ng-init="playchoice1='pass'">
+                            <option value="pass">Pass</option>
+                            <option value="middlerun">Run up the middle</option>
+                            <option value="outsiderun">Outside run</option>
+                            <option value="fieldgoal">Field goal attempt</option>
+                            <option value="punt">Punt</option>
+                            <option value="twopoint">Two Point attempt</option>
+                            <option value="extrapoint">Extra Point attempt</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label for="playchoice2">Play Choice 2:</label>
+                        <select class="form-control" id="playchoice2" ng-model="playchoice2" ng-init="playchoice2='pass'">
+                            <option value="pass">Pass</option>
+                            <option value="middlerun">Run up the middle</option>
+                            <option value="outsiderun">Outside run</option>
+                            <option value="fieldgoal">Field goal attempt</option>
+                            <option value="punt">Punt</option>
+                            <option value="twopoint">Two Point attempt</option>
+                            <option value="extrapoint">Extra Point attempt</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team, playchoice)">Submit</button>
+
+            <button type="submit" class="btn btn-default" ng-click="get_results(down, togo, ydline, team, playchoice1, playchoice2)">Submit</button>
         </form>
 
         <img src="/images/ajax-loader.gif" id="loading-indicator" style="display:none" class="img-responsive center-block" />
         <div class="container-fluid">
-            <h2>{{results['title']}}</h2>
-            <div id="results_div">
-                <h3 ng-repeat="name in results.names">{{results["pretty" + name] }}: {{ results[name] }}</h3>
+            <div class="col-xs-6">
+                <h2>{{results['title1']}}</h2>
+                <div id="results_div1">
+                    <h3 ng-repeat="name in results.names1">{{results["pretty" + name] }}: {{ results[name] }}</h3>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <h2>{{results['title2']}}</h2>
+                <div id="results_div2">
+                    <h3 ng-repeat="name in results.names2">{{results["pretty" + name] }}: {{ results[name] }}</h3>
+                </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -163,7 +190,7 @@
     app.controller('customersCtrl', function($scope, $http) {
         $scope.results = [];
 
-        $scope.get_results = function(down, togo, ydline, team, playchoice) {
+        $scope.get_results = function(down, togo, ydline, team, playchoice1, playchoice2) {
             $('#loading-indicator').show();
             $scope.results = [];
 
@@ -171,11 +198,15 @@
                             + "&togo=" + togo
                             + "&ydline=" + ydline
                             + "&team=" + team
-                            + "&playchoice=" + playchoice)
+                            + "&playchoice1=" + playchoice1
+                            + "&playchoice2=" + playchoice2)
                     .success(function (response) {
                         $('#loading-indicator').hide();
-                        for (i = 0; i < response['names'].length; i++) {
-                            response[["pretty" + response['names'][i]]] = response['prettyNames'][i];
+                        for (i = 0; i < response['names1'].length; i++) {
+                            response[["pretty" + response['names1'][i]]] = response['prettyNames'][i];
+                        }
+                        for (i = 0; i < response['names2'].length; i++) {
+                            response[["pretty" + response['names2'][i]]] = response['prettyNames'][i];
                         }
                         $scope.results = response;
                     });

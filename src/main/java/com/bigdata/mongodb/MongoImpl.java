@@ -7,6 +7,7 @@ import com.bigdatanfl.server.Utilities;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 
 public class MongoImpl implements MongoDBInterface {
@@ -24,8 +25,7 @@ public class MongoImpl implements MongoDBInterface {
         return collection.find();
     }
 
-    @Override
-    public SituationStatisticsReport getPlayStats(int down, int togo, int ydline, String team) {
+    private BasicDBObject buildBasicQuery(int down, int togo, int ydline, String team) {
         BasicDBObject query = new BasicDBObject();
 
         if (down == 0) //Extra point or kickoff
@@ -38,6 +38,13 @@ public class MongoImpl implements MongoDBInterface {
 
         if (!team.equals("ANY"))
             query.append("off", team);
+
+        return query;
+    }
+
+    @Override
+    public SituationStatisticsReport getPlayStats(int down, int togo, int ydline, String team) {
+        BasicDBObject query = buildBasicQuery(down, togo, ydline, team);
 
         BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
         BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
@@ -80,14 +87,51 @@ public class MongoImpl implements MongoDBInterface {
     private long timeCount(BasicDBObject query) {
         long startTime = System.currentTimeMillis();
         long count = collection.count(query);
+        System.out.println(query);
         System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime) + "\t" + query);
         return count;
     }
 
     @Override
-    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play) {
-        //TODO: FIX THIS!!
-        return null;
+    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play1, String play2) {
+        BasicDBObject query = buildBasicQuery(down, togo, ydline, team);
+
+        BasicDBObject query1 = (BasicDBObject) query.append("play-choice", new BasicDBObject("$in", Utilities.toPlayChoice(play1))).copy();
+        BasicDBObject query2 = (BasicDBObject) query.append("play-choice", new BasicDBObject("$in", Utilities.toPlayChoice(play2))).copy();
+
+        //> db.playbyplay.aggregate([
+        //      {$match: { "down" : 2 , "togo" : 10 , "ydline" : { "$lte" : 80 , "$gt" : 70} , "play-choice" : "PASS"}},
+        //      {$group: {_id: "query", avgYards: {$avg: "$yards-gained"}, avgPoints: {$avg: "$points-scored"}}}] )
+        BasicDBObject match1 = new BasicDBObject("$match", query1);
+        BasicDBObject match2 = new BasicDBObject("$match", query2);
+        BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id", "query")
+                .append("avgYards", new BasicDBObject("$avg", "$yards-gained"))
+                .append("avgPoints", new BasicDBObject("$avg", "$points-scored")));
+
+        System.out.println(match1 + "\n" + group);
+        System.out.println(match2 + "\n" + group);
+        AggregationOutput output1 = collection.aggregate(Arrays.asList(new DBObject[]{match1, group}));
+        AggregationOutput output2 = collection.aggregate(Arrays.asList(new DBObject[]{match2, group}));
+
+        double avgYards1 = 0;
+        double avgYards2 = 0;
+        double avgPoints1 = 0;
+        double avgPoints2 = 0;
+        if (output1.results().iterator().hasNext()) {
+            avgYards1 = (double) output1.results().iterator().next().get("avgYards");
+            avgPoints1 = (double) output1.results().iterator().next().get("avgPoints");
+        }
+        if (output2.results().iterator().hasNext()) {
+            avgYards2 = (double) output2.results().iterator().next().get("avgYards");
+            avgPoints2 = (double) output2.results().iterator().next().get("avgPoints");
+        }
+
+        return new ExpectationsStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team, play1),
+                Utilities.getExpectationsTitle(down, togo, ydline, team, play2),
+                avgYards1,
+                avgPoints1,
+                avgYards2,
+                avgPoints2);
     }
 
 

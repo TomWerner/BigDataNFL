@@ -1,6 +1,7 @@
 package com.bigdatanfl.server;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -38,14 +39,29 @@ public class Utilities {
     }
 
     private static String getPlay(String play) {
-        System.out.println(play);
         if (play.equals("pass")) return "Pass";
         if (play.equals("middlerun")) return "Run up the middle";
-        if (play.equals("run")) return "Outside run";
+        if (play.equals("outsiderun")) return "Outside run";
         if (play.equals("fieldgoal")) return "Field goal attempt";
         if (play.equals("punt")) return "Punt";
-        if (play.equals("fakepunt")) return "Fake Punt";
+        if (play.equals("twopoint")) return "Two Point attempt";
+        if (play.equals("extrapoint")) return "Extra Point attempt";
         return "Other";
+    }
+
+    private static String[] toMongoList(String... args) {
+        return args;
+    }
+
+    public static String[] toPlayChoice(String play) {
+        if (play.equals("pass")) return toMongoList("PASS", "PASS INCOMPLETE");
+        if (play.equals("middlerun")) return toMongoList("RUN MIDDLE", "RUN OTHER");
+        if (play.equals("outsiderun")) return toMongoList("RUN LEFT", "RUN RIGHT");
+        if (play.equals("fieldgoal")) return toMongoList("FIELD GOAL");
+        if (play.equals("punt")) return toMongoList("PUNT");
+        if (play.equals("twopoint")) return toMongoList("TWO POINT ATTEMPT");
+        if (play.equals("extrapoint")) return toMongoList("EXTRA POINT");
+        return toMongoList("OTHER");
     }
 
 
