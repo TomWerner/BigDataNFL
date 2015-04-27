@@ -48,7 +48,7 @@ db.playbyplay.update({"$text": { "$search" : "\"extra point is good\""}, "points
 db.playbyplay.update({"$text": { "$search" : "\"extra point is no good\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
 db.playbyplay.update({"$text": { "$search" : "\"extra point is blocked\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
 db.playbyplay.update({"$text": { "$search" : "\"extra point is aborted\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
-db.playbyplay.update({"$text": { "$search" : "\"made the extra point\""}, "points-scored": null}, {$set: {"points-scored": 0}}, false, true)
+db.playbyplay.update({"$text": { "$search" : "\"made the extra point\""}, "points-scored": null}, {$set: {"points-scored": 1}}, false, true)
 db.playbyplay.update({"$text": { "$search" : "FUMBLE"}}, {$set: {"play-choice": "FUMBLE"}}, false, true)
 db.playbyplay.update({"_id":  ObjectId("55295a71dac696a54e529084")}, {$set: {"play-choice": "KICK"}}, false, true)
 db.playbyplay.update({"_id": ObjectId("55295a77dac696a54e534a6e")}, {$set: {"play-choice": "KICK"}}, false, true)
