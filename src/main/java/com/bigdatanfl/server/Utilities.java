@@ -27,15 +27,15 @@ public class Utilities {
         return "Path Error. Tried " + path + ".";
     }
 
-    public static String getStatsTitle(int down, int togo, int ydline, String team) {
-        return getTeam(team) + " decisions when faced with " + getDown(down) + " and " + getTogo(togo) + " yards to go, on their " + getYardline(ydline);
+    public static String getStatsTitle(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
+        return getTeam(team) + " decisions when faced with " + getDown(down) + " and " + getTogo(togo_start, togo_end) + " yards to go, bewteen their " + getYardline(ydline_start) + " and their " + getYardline(ydline_end);
     }
 
-    public static String getExpectationsTitle(int down, int togo, int ydline, String team, String play) {
+    public static String getExpectationsTitle(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team, String play) {
         return getTeam(team) + " outcomes when doing a \"" + getPlay(play) + "\" play faced with " +
                 getDown(down) + " and " +
-                getTogo(togo) + " yards to go, on their " +
-                getYardline(ydline);
+                getTogo(togo_start, togo_end) + " yards to go, between their " +
+                getYardline(ydline_start) + " and their " + getYardline(ydline_end);
     }
 
     private static String getPlay(String play) {
@@ -84,22 +84,15 @@ public class Utilities {
             return "Special Teams";
     }
 
-    private static String getTogo(int togo) {
-        return "" + togo;
+    private static String getTogo(int togoStart, int togoEnd) {
+        return "" + togoStart + " to " + togoEnd;
     }
 
     private static String getYardline(int ydline) {
-        if (ydline == 100) return "Own: Goal line - 10";
-        else if (ydline == 90) return "Own: 10 - 20";
-        else if (ydline == 80) return "Own: 20 - 30";
-        else if (ydline == 70) return "Own: 30 - 40";
-        else if (ydline == 60) return "Own: 40 - 50";
-        else if (ydline == 50) return "Opp: 50 - 40";
-        else if (ydline == 40) return "Opp: 40 - 30";
-        else if (ydline == 30) return "Opp: 30 - 20";
-        else if (ydline == 20) return "Opp: 20 - 10";
-        else if (ydline == 10) return "Opp: 10 - Goal line";
-        else return "other yardage";
+        if (ydline > 50)
+            return "Own " + (100 - ydline);
+        else
+            return "Opp " + ydline;
     }
 
     public static String getTeamName(String teamABVR) {
@@ -142,5 +135,9 @@ public class Utilities {
 
     public static InputStream inputStream(String path) throws FileNotFoundException {
         return new BufferedInputStream(new FileInputStream(path));
+    }
+
+    public static String toString(double number) {
+        return String.format("%.02f", number);
     }
 }

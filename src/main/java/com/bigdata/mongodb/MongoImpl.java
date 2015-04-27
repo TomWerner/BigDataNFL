@@ -25,15 +25,15 @@ public class MongoImpl implements MongoDBInterface {
         return collection.find();
     }
 
-    private BasicDBObject buildBasicQuery(int down, int togo, int ydline, String team) {
+    private BasicDBObject buildBasicQuery(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
         BasicDBObject query = new BasicDBObject();
 
         if (down == 0) //Extra point or kickoff
             query.put("down", "");
         else {//Normal case
             query.put("down", down);
-            query.put("togo", togo);
-            query.put("ydline", new BasicDBObject("$lte", ydline).append("$gt", (ydline - 10)));
+            query.put("togo", new BasicDBObject("$lte", togo_start).append("$gt", togo_end));
+            query.put("ydline", new BasicDBObject("$lte", ydline_start).append("$gt", ydline_end));
         }
 
         if (!team.equals("ANY"))
@@ -43,8 +43,8 @@ public class MongoImpl implements MongoDBInterface {
     }
 
     @Override
-    public SituationStatisticsReport getPlayStats(int down, int togo, int ydline, String team) {
-        BasicDBObject query = buildBasicQuery(down, togo, ydline, team);
+    public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
+        BasicDBObject query = buildBasicQuery(down, togo_start, togo_end, ydline_start, ydline_end, team);
 
         BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
         BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
@@ -70,7 +70,7 @@ public class MongoImpl implements MongoDBInterface {
         long puntPlays = timeCount(puntQuery);
         long spikePlays = timeCount(spikeQuery);
 
-        return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo, ydline, team),
+        return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team),
                                             totalPlays,
                                             passPlays,
                                             incompletePassPlays,
@@ -87,14 +87,13 @@ public class MongoImpl implements MongoDBInterface {
     private long timeCount(BasicDBObject query) {
         long startTime = System.currentTimeMillis();
         long count = collection.count(query);
-        System.out.println(query);
         System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime) + "\t" + query);
         return count;
     }
 
     @Override
-    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo, int ydline, String team, String play1, String play2) {
-        BasicDBObject query = buildBasicQuery(down, togo, ydline, team);
+    public ExpectationsStatisticsReport getPlayExpectations(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team, String play1, String play2) {
+        BasicDBObject query = buildBasicQuery(down, togo_start, togo_end, ydline_start, ydline_end, team);
 
         BasicDBObject query1 = (BasicDBObject) query.append("play-choice", new BasicDBObject("$in", Utilities.toPlayChoice(play1))).copy();
         BasicDBObject query2 = (BasicDBObject) query.append("play-choice", new BasicDBObject("$in", Utilities.toPlayChoice(play2))).copy();
@@ -125,13 +124,17 @@ public class MongoImpl implements MongoDBInterface {
             avgYards2 = (double) output2.results().iterator().next().get("avgYards");
             avgPoints2 = (double) output2.results().iterator().next().get("avgPoints");
         }
+        int match1Count = (int) collection.count(query1);
+        int match2Count = (int) collection.count(query2);
 
-        return new ExpectationsStatisticsReport(Utilities.getExpectationsTitle(down, togo, ydline, team, play1),
-                Utilities.getExpectationsTitle(down, togo, ydline, team, play2),
+        return new ExpectationsStatisticsReport(Utilities.getExpectationsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team, play1),
+                Utilities.getExpectationsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team, play2),
                 avgYards1,
                 avgPoints1,
                 avgYards2,
-                avgPoints2);
+                avgPoints2,
+                match1Count,
+                match2Count);
     }
 
 
