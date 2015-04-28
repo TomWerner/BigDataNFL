@@ -8,6 +8,8 @@ import com.mongodb.*;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class MongoImpl implements MongoDBInterface {
@@ -46,42 +48,45 @@ public class MongoImpl implements MongoDBInterface {
     public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
         BasicDBObject query = buildBasicQuery(down, togo_start, togo_end, ydline_start, ydline_end, team);
 
-        BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
-        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
-        BasicDBObject fieldGoalQuery = (BasicDBObject) query.append("play-choice", "FIELD GOAL").copy();
-        BasicDBObject extraPointQuery = (BasicDBObject) query.append("play-choice", "EXTRA POINT").copy();
-        BasicDBObject runMiddleQuery = (BasicDBObject) query.append("play-choice", "RUN MIDDLE").copy();
-        BasicDBObject runLeftQuery = (BasicDBObject) query.append("play-choice", "RUN LEFT").copy();
-        BasicDBObject runRightQuery = (BasicDBObject) query.append("play-choice", "RUN RIGHT").copy();
-        BasicDBObject runOtherQuery = (BasicDBObject) query.append("play-choice", "RUN OTHER").copy();
-//        BasicDBObject fumbleQuery = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
-        BasicDBObject puntQuery = (BasicDBObject) query.append("play-choice", "PUNT").copy();
-        BasicDBObject spikeQuery = (BasicDBObject) query.append("play-choice", "SPIKE").copy();
+        //> db.playbyplay.aggregate([
+        //  {$match   : { "down" : 4 , "togo" : { "$lte" : 10 , "$gt" : 0} , "ydline" : { "$lte" : 3 , "$gt" : 0} }},
+        // { "$match" : { "down" : 1 , "togo" : { "$lte" : 10 , "$gt" : 5} , "ydline" : { "$lte" : 80 , "$gt" : 70}}}
+        // { "$group" : { "_id" : "$play-choice" , "count" : { "$sum" : "1"}}}
+        // { $group   : {_id: "$play-choice",       count: { $sum: 1      }}}
+        // ])
+        BasicDBObject match1 = new BasicDBObject("$match", query);
+        BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id", "$play-choice")
+                .append("count", new BasicDBObject("$sum", 1)));
 
-        long totalPlays = timeCount(query);
-        long passPlays = timeCount(passQuery);
-        long incompletePassPlays = timeCount(incompletePassQuery);
-        long fieldGoalPlays = timeCount(fieldGoalQuery);
-        long extraPointPlays = timeCount(extraPointQuery);
-        long runMiddlePlays = timeCount(runMiddleQuery);
-        long runLeftPlays = timeCount(runLeftQuery);
-        long runRightPlays = timeCount(runRightQuery);
-        long runOtherPlays = timeCount(runOtherQuery);
-        long puntPlays = timeCount(puntQuery);
-        long spikePlays = timeCount(spikeQuery);
+        System.out.println(match1 + "\n" + group);
+        AggregationOutput output1 = collection.aggregate(Arrays.asList(new DBObject[]{match1, group}));
+        Iterator<DBObject> iterator = output1.results().iterator();
+        //{ "_id" : "SPIKE", "count" : 2 }
+        //{ "_id" : "SACK", "count" : 9 }
+        //{ "_id" : "RUN OTHER", "count" : 28 }
+        //{ "_id" : "KNEEL", "count" : 1 }
+        //{ "_id" : "FIELD GOAL", "count" : 661 }
+        //{ "_id" : "PASS INCOMPLETE", "count" : 83 }
+        //{ "_id" : "RUN LEFT", "count" : 78 }
+        //{ "_id" : "RUN RIGHT", "count" : 82 }
+        //{ "_id" : "PASS", "count" : 100 }
+        //{ "_id" : "RUN MIDDLE", "count" : 107 }
 
-        return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team),
-                                            totalPlays,
-                                            passPlays,
-                                            incompletePassPlays,
-                                            fieldGoalPlays,
-                                            extraPointPlays,
-                                            runMiddlePlays,
-                                            runLeftPlays,
-                                            runRightPlays,
-                                            runOtherPlays,
-                                            puntPlays,
-                                            spikePlays);
+        String title = Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team);
+        HashMap<String, Integer> playCounts = new HashMap<>();
+        while (iterator.hasNext()) {
+            DBObject obj = iterator.next();
+            System.out.println(obj);
+            playCounts.put((String) obj.get("_id"), (Integer) obj.get("count"));
+        }
+        /*
+        {
+            "playCounts":{"query":0},
+            "title":"Coach decisions when faced with First Down and 10 to 5 yards to go, bewteen their Own 20 and their Own 30"}
+         */
+
+        System.out.println(playCounts);
+        return new SituationStatisticsReport(title, playCounts);
     }
 
     private long timeCount(BasicDBObject query) {

@@ -155,9 +155,9 @@
                         data.addColumn('string', 'Play');
                         data.addColumn('number', 'Plays');
 
-                        for (i = 0; i < response['names'].length; i++) {
-                            console.log(response['names'][i]);
-                            data.addRow([response['prettyNames'][i], response[response['names'][i]]]);
+                        for (var play in response['playCounts']) {
+                            var playCount = response['playCounts'][play];
+                            data.addRow([play, playCount]);
                         }
 
                         // Set chart options

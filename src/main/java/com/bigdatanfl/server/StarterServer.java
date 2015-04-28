@@ -11,6 +11,8 @@ import spark.utils.IOUtils;
 
 import javax.servlet.ServletOutputStream;
 
+import java.util.HashMap;
+
 import static spark.Spark.*;
 
 public class StarterServer {
@@ -87,7 +89,9 @@ public class StarterServer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team), 100, 20, 15, 10, 5, 15, 15, 10, 10, 4, 1);
+            return new SituationStatisticsReport(
+                    Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team),
+                    new HashMap<String, Integer>());
         }
 
         @Override
