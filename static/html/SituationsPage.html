@@ -117,12 +117,30 @@
                     <option value="WAS">Washington Redskins</option>
                 </select>
             </div>
-
-            <button type="submit" class="btn btn-default" ng-click="get_results(down, team)">Submit</button>
+            <div class="form-group">
+                <input type="checkbox" name="collapseRuns" ng-model="collapseRuns"> Collapse Runs<br>
+            </div>
+            <button type="submit" class="btn btn-default" ng-click="get_results(down, team, collapseRuns)">Submit</button>
         </form>
 
         <img src="/images/ajax-loader.gif" id="loading-indicator" style="display:none" class="img-responsive center-block" />
         <div id="chart_div" style="width:100%;height:600px"></div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Play</th>
+                <th>Avg Yards Gained</th>
+                <th>Avg Points Scored</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="play in results['plays']">
+                    <td>{{ play }}</td>
+                    <td> {{ results['avgYards'][play] }} </td>
+                    <td> {{ results['avgPoints'][play] }} </td>
+                <tr>
+            </tbody>
+        </table>
 
     </div>
 </div>
@@ -134,7 +152,7 @@
         $scope.results = [];
         var chart;
 
-        $scope.get_results = function(down, team) {
+        $scope.get_results = function(down, team, collapseRuns) {
             $('#loading-indicator').show();
             if (chart != null) {
                 chart.clearChart();
@@ -143,22 +161,37 @@
             var end1 = 100 - $( "#slider-range-ydline" ).slider( "values", 1);
             var start2 = 10 - $( "#slider-range-togo" ).slider( "values", 0);
             var end2 = 10 - $( "#slider-range-togo" ).slider( "values", 1);
+            var collapse_runs = collapseRuns;
+            if (collapse_runs == true) {
+                collapse_runs = 1;
+            }
+            else {
+                collapse_runs = 0;
+            }
+            console.log(collapse_runs);
             $http.get("/api/playstats?down=" + down
                 + "&togo_start=" + start2
                 + "&togo_end=" + end2
                 + "&ydline_start=" + start1
                 + "&ydline_end=" + end1
-                + "&team=" + team)
+                + "&team=" + team
+                + "&collapse_runs=" + collapse_runs)
                     .success(function (response) {
                         $scope.results = response;
                         var data = new google.visualization.DataTable();
                         data.addColumn('string', 'Play');
                         data.addColumn('number', 'Plays');
 
-                        for (i = 0; i < response['names'].length; i++) {
-                            console.log(response['names'][i]);
-                            data.addRow([response['prettyNames'][i], response[response['names'][i]]]);
+                        $scope.results['plays'] = [];
+
+                        for (var play in response['playCounts']) {
+                            var playCount = response['playCounts'][play];
+                            data.addRow([play, playCount]);
+                            if (response['avgYards'][play] != null && response['playCounts'][play] > 10) {
+                                $scope.results['plays'][$scope.results['plays'].length] = (play);
+                            }
                         }
+                        data.sort([{column: 0, desc:true}])
 
                         // Set chart options
                         var options = {'title': response['title'],

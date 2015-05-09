@@ -32,6 +32,8 @@ public class Utilities {
     }
 
     public static String getExpectationsTitle(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team, String play) {
+        if (play.equals("twopoint") || play.equals("extrapoint"))
+            return getTeam(team) + " outcomes when doing a \"" + getPlay(play) + "\"";
         return getTeam(team) + " outcomes when doing a \"" + getPlay(play) + "\" play faced with " +
                 getDown(down) + " and " +
                 getTogo(togo_start, togo_end) + " yards to go, between their " +

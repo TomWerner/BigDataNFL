@@ -11,6 +11,8 @@ import spark.utils.IOUtils;
 
 import javax.servlet.ServletOutputStream;
 
+import java.util.HashMap;
+
 import static spark.Spark.*;
 
 public class StarterServer {
@@ -29,9 +31,10 @@ public class StarterServer {
             int togo_end = Integer.parseInt(req.queryParams("togo_end"));
             int ydline_start = Integer.parseInt(req.queryParams("ydline_start"));
             int ydline_end = Integer.parseInt(req.queryParams("ydline_end"));
+            int collapseRuns = Integer.parseInt(req.queryParams("collapse_runs"));
             String team = req.queryParams("team");
 
-            String result = new Gson().toJson(mongo.getPlayStats(down, togo_start, togo_end, ydline_start, ydline_end, team));
+            String result = new Gson().toJson(mongo.getPlayStats(down, togo_start, togo_end, ydline_start, ydline_end, team, (collapseRuns == 1)));
             System.out.println(result);
             return result;
         });
@@ -81,13 +84,15 @@ public class StarterServer {
         }
 
         @Override
-        public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
+        public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team, boolean collapseRuns) {
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team), 100, 20, 15, 10, 5, 15, 15, 10, 10, 4, 1);
+            return new SituationStatisticsReport(
+                    Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team),
+                    new HashMap<String, Integer>(), new HashMap<String, String>(), new HashMap<String, String>());
         }
 
         @Override

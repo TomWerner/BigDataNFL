@@ -8,6 +8,8 @@ import com.mongodb.*;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class MongoImpl implements MongoDBInterface {
@@ -43,52 +45,133 @@ public class MongoImpl implements MongoDBInterface {
     }
 
     @Override
-    public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team) {
+    public SituationStatisticsReport getPlayStats(int down, int togo_start, int togo_end, int ydline_start, int ydline_end, String team, boolean collapseRuns) {
         BasicDBObject query = buildBasicQuery(down, togo_start, togo_end, ydline_start, ydline_end, team);
 
-        BasicDBObject passQuery = (BasicDBObject) query.append("play-choice", "PASS").copy();
-        BasicDBObject incompletePassQuery = (BasicDBObject) query.append("play-choice", "PASS INCOMPLETE").copy();
-        BasicDBObject fieldGoalQuery = (BasicDBObject) query.append("play-choice", "FIELD GOAL").copy();
-        BasicDBObject extraPointQuery = (BasicDBObject) query.append("play-choice", "EXTRA POINT").copy();
-        BasicDBObject runMiddleQuery = (BasicDBObject) query.append("play-choice", "RUN MIDDLE").copy();
-        BasicDBObject runLeftQuery = (BasicDBObject) query.append("play-choice", "RUN LEFT").copy();
-        BasicDBObject runRightQuery = (BasicDBObject) query.append("play-choice", "RUN RIGHT").copy();
-        BasicDBObject runOtherQuery = (BasicDBObject) query.append("play-choice", "RUN OTHER").copy();
-//        BasicDBObject fumbleQuery = (BasicDBObject) query.append("play-choice", "FUMBLE").copy();
-        BasicDBObject puntQuery = (BasicDBObject) query.append("play-choice", "PUNT").copy();
-        BasicDBObject spikeQuery = (BasicDBObject) query.append("play-choice", "SPIKE").copy();
+        BasicDBObject match1 = new BasicDBObject("$match", query);
+        BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id", "$play-choice")
+                .append("count", new BasicDBObject("$sum", 1))
+                .append("avgYards", new BasicDBObject("$avg", "$yards-gained"))
+                .append("avgPoints", new BasicDBObject("$avg", "$points-scored")));
 
-        long totalPlays = timeCount(query);
-        long passPlays = timeCount(passQuery);
-        long incompletePassPlays = timeCount(incompletePassQuery);
-        long fieldGoalPlays = timeCount(fieldGoalQuery);
-        long extraPointPlays = timeCount(extraPointQuery);
-        long runMiddlePlays = timeCount(runMiddleQuery);
-        long runLeftPlays = timeCount(runLeftQuery);
-        long runRightPlays = timeCount(runRightQuery);
-        long runOtherPlays = timeCount(runOtherQuery);
-        long puntPlays = timeCount(puntQuery);
-        long spikePlays = timeCount(spikeQuery);
+        System.out.println(match1 + "\n" + group);
+        AggregationOutput output1 = collection.aggregate(Arrays.asList(new DBObject[]{match1, group}));
+        Iterator<DBObject> iterator = output1.results().iterator();
 
-        return new SituationStatisticsReport(Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team),
-                                            totalPlays,
-                                            passPlays,
-                                            incompletePassPlays,
-                                            fieldGoalPlays,
-                                            extraPointPlays,
-                                            runMiddlePlays,
-                                            runLeftPlays,
-                                            runRightPlays,
-                                            runOtherPlays,
-                                            puntPlays,
-                                            spikePlays);
+        String title = Utilities.getStatsTitle(down, togo_start, togo_end, ydline_start, ydline_end, team);
+        HashMap<String, Integer> playCounts = new HashMap<>();
+        HashMap<String, String> avgYards = new HashMap<>();
+        HashMap<String, String> avgPoints = new HashMap<>();
+        while (iterator.hasNext()) {
+            DBObject obj = iterator.next();
+//            System.out.println(obj);
+            int playCount = (Integer) obj.get("count");
+            String key = (String) obj.get("_id");
+
+            if (key == null)
+                continue;
+
+            String modKey = key;
+            int oldCount = 0;
+            if (collapseRuns) {
+                if (contains(new String[]{"RUN LEFT", "RUN RIGHT"}, key)) {
+                    modKey = "RUN OUTSIDE";
+                    if (playCounts.containsKey("RUN OUTSIDE"))
+                        oldCount = playCounts.get("RUN OUTSIDE");
+                }
+                if (contains(new String[]{"RUN MIDDLE", "RUN OTHER"}, key)) {
+                    modKey = "RUN MIDDLE";
+                    if (playCounts.containsKey("RUN MIDDLE"))
+                        oldCount = playCounts.get("RUN MIDDLE");
+                }
+            }
+            playCounts.put(modKey, playCount + oldCount);
+
+
+            if (!(key.equals("null") || key.equals("FUMBLE"))) {
+                double avgYardVal = (double) obj.get("avgYards");
+                double avgPointVal = (double) obj.get("avgPoints");
+
+                Object[] result = collapseRows(playCounts, avgYards, avgPoints, avgYardVal, avgPointVal, playCount, key, "PASS", new String[]{"PASS", "PASS INCOMPLETE"});
+                avgYardVal = (double) result[0];
+                avgPointVal = (double) result[1];
+                key = (String) result[2];
+
+                if (collapseRuns) {
+                    result = collapseRows(playCounts, avgYards, avgPoints, avgYardVal, avgPointVal, playCount, key, "RUN OUTSIDE", new String[]{"RUN LEFT", "RUN RIGHT"});
+                    avgYardVal = (double) result[0];
+                    avgPointVal = (double) result[1];
+                    key = (String) result[2];
+
+                    result = collapseRows(playCounts, avgYards, avgPoints, avgYardVal, avgPointVal, playCount, key, "RUN MIDDLE", new String[]{"RUN MIDDLE", "RUN OTHER"});
+                    avgYardVal = (double) result[0];
+                    avgPointVal = (double) result[1];
+                    key = (String) result[2];
+                }
+
+                avgYards.put(key, Utilities.toString(avgYardVal));
+                avgPoints.put(key, Utilities.toString(avgPointVal));
+            }
+        }
+
+        return new SituationStatisticsReport(title, playCounts, avgYards, avgPoints);
     }
 
-    private long timeCount(BasicDBObject query) {
-        long startTime = System.currentTimeMillis();
-        long count = collection.count(query);
-        System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime) + "\t" + query);
-        return count;
+    private Object[] collapseRows(HashMap<String, Integer> playCounts,
+                                  HashMap<String, String> avgYards,
+                                  HashMap<String, String> avgPoints,
+                                  double avgYardVal,
+                                  double avgPointVal,
+                                  int playCount,
+                                  String key, String reduceTo, String[] strings) {
+        if (contains(strings, key)) {
+            double newCount = playCount;
+            double oldCount = 0;
+            if (!key.equals(reduceTo) && playCounts.containsKey(reduceTo))
+                oldCount = playCounts.get(reduceTo);
+//            System.out.println(newCount + ", " + oldCount + ", " + key);
+            key = reduceTo;
+
+            double oldAvgYard = 0;
+            double oldAvgPoint = 0;
+            if (avgYards.containsKey(reduceTo)) {
+                oldAvgYard = Double.parseDouble(avgYards.get(reduceTo));
+                oldAvgPoint = Double.parseDouble(avgPoints.get(reduceTo));
+            }
+//            System.out.println(oldAvgYard + ", " + avgYardVal);
+            avgYardVal = (oldAvgYard * oldCount + avgYardVal * newCount) / (oldCount + newCount);
+            avgPointVal = (oldAvgPoint * oldCount + avgPointVal * newCount) / (oldCount + newCount);
+//            System.out.println(avgYardVal);
+        }
+//        if (key.equals("PASS INCOMPLETE") && avgPoints.containsKey("PASS")) {
+//            key = "PASS";
+//            double oldAvgYard = Double.parseDouble(avgYards.get("PASS"));
+//            double oldAvgPoint = Double.parseDouble(avgPoints.get("PASS"));
+//            double passCount = playCounts.get("PASS");
+//            double incompleteCount = playCounts.get("PASS INCOMPLETE");
+//
+//            avgYardVal = (oldAvgYard * passCount + avgYardVal * incompleteCount) / (passCount + incompleteCount);
+//            avgPointVal = (oldAvgPoint * passCount + avgPointVal * incompleteCount) / (passCount + incompleteCount);
+//        }
+//        else if (key.equals("PASS") && avgPoints.containsKey("PASS INCOMPLETE")) {
+//            double oldAvgYard = Double.parseDouble(avgYards.get("PASS INCOMPLETE"));
+//            double oldAvgPoint = Double.parseDouble(avgPoints.get("PASS INCOMPLETE"));
+//            double passCount = playCounts.get("PASS");
+//            double incompleteCount = playCounts.get("PASS INCOMPLETE");
+//
+//            avgYardVal = (oldAvgYard * incompleteCount + avgYardVal * passCount) / (passCount + incompleteCount);
+//            avgPointVal = (oldAvgPoint * incompleteCount + avgPointVal * passCount) / (passCount + incompleteCount);
+//            avgPoints.remove("PASS INCOMPLETE");
+//            avgYards.remove("PASS INCOMPLETE");
+//        }
+        return new Object[]{avgYardVal, avgPointVal, key};
+    }
+
+    private boolean contains(String[] array, String value) {
+        for (String string : array)
+            if (value.equals(string))
+                return true;
+        return false;
     }
 
     @Override

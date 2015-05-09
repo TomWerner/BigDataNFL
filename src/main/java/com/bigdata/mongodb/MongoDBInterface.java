@@ -15,7 +15,8 @@ public interface MongoDBInterface {
                                                   int togo_end,
                                                   int ydline_start,
                                                   int ydline_end,
-                                                  String team);
+                                                  String team,
+                                                  boolean collapseRuns);
 
     public ExpectationsStatisticsReport getPlayExpectations(int down,
                                                             int togo_start,
