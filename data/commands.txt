@@ -57,8 +57,7 @@ db.playbyplay.update({"play-choice": "PASS INCOMPLETE"}, {$set: {"yards-gained":
 db.playbyplay.update({"_id" : ObjectId("55295a77dac696a54e534a6e")}, {$set: {"yards-gained":null}}, false, true)
 db.playbyplay.update({"description":/T.Spikes/}, {$set: {"play-choice":null}}, false, true)
 
-db.playbyplay.update({"description":/T.Spikes/}, {$set: {"play-choice":null}}, false, true)
-db.playbyplay.update({"play-choice": null, "$text": { "$search" : "\up the middle\"}}, {$set: {"play-choice": "RUN MIDDLE"}}, false, true)
+db.playbyplay.update({"description":/[A-Z]. ?Spikes/}, {$set: {"play-choice":null}}, false, true)
 db.playbyplay.update({"play-choice": null, "$text": { "$search" : "\"up the middle\""}}, {$set: {"play-choice": "RUN MIDDLE"}}, false, true)
 db.playbyplay.update({"play-choice": null, "$text": { "$search" : "left"}}, {$set: {"play-choice": "RUN LEFT"}}, false, true)
 db.playbyplay.update({"play-choice": null, "$text": { "$search" : "right"}}, {$set: {"play-choice": "RUN RIGHT"}}, false, true)
