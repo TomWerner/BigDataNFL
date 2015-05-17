@@ -1,6 +1,6 @@
 package com.bigdata.DataReporting;
 
-import com.bigdatanfl.server.Utilities;
+import com.bigdata.Server.Utilities;
 
 /**
  * Created by Tom on 4/14/2015.

@@ -1,4 +1,4 @@
-package com.bigdatanfl.server;
+package com.bigdata.Server;
 
 import com.bigdata.DataReporting.ExpectationsStatisticsReport;
 import com.bigdata.DataReporting.SituationStatisticsReport;

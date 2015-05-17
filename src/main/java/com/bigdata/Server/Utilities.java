@@ -1,7 +1,6 @@
-package com.bigdatanfl.server;
+package com.bigdata.Server;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 

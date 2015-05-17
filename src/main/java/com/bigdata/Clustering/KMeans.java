@@ -6,6 +6,8 @@ import com.bigdata.DataReporting.SituationStatisticsReport;
 import com.bigdata.Server.Utilities;
 import com.google.gson.Gson;
 import com.mongodb.*;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 import java.net.UnknownHostException;
 import java.util.*;
@@ -70,6 +72,9 @@ public class KMeans {
             for (String str : stringResults)
                 System.out.println(str);
             System.out.println("\n");
+
+            RealMatrix matrix =
+            new SingularValueDecomposition()
         }
     }
 
